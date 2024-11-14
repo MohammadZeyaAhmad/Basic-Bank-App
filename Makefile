@@ -30,9 +30,11 @@ migratedown1:
 new_migration:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
-
 sqlc:
 	sqlc generate
+
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/MohammadZeyaAhmad/bank/db/sqlc Store
 
 test:
 	go test -v -cover -short ./...
