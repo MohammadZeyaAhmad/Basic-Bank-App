@@ -9,8 +9,10 @@ import (
 
 	"github.com/MohammadZeyaAhmad/bank/token"
 	"github.com/MohammadZeyaAhmad/bank/util"
+	mockwk "github.com/MohammadZeyaAhmad/bank/worker/mock"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
+	gomock "go.uber.org/mock/gomock"
 )
 
 func addAuthorization(
@@ -89,7 +91,10 @@ func TestAuthMiddleware(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			server := newTestServer(t, nil)
+			taskCtrl := gomock.NewController(t)
+			defer taskCtrl.Finish()
+			taskDistributor := mockwk.NewMockTaskDistributor(taskCtrl)
+			server := newTestServer(t, nil, taskDistributor)
 			authPath := "/auth"
 			server.router.GET(
 				authPath,

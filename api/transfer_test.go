@@ -13,6 +13,7 @@ import (
 	db "github.com/MohammadZeyaAhmad/bank/db/sqlc"
 	"github.com/MohammadZeyaAhmad/bank/token"
 	"github.com/MohammadZeyaAhmad/bank/util"
+	mockwk "github.com/MohammadZeyaAhmad/bank/worker/mock"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	gomock "go.uber.org/mock/gomock"
@@ -272,8 +273,9 @@ func TestTransferAPI(t *testing.T) {
 
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
-
-			server := newTestServer(t, store)
+            
+			worker:=mockwk.NewMockTaskDistributor(ctrl)
+			server := newTestServer(t, store, worker)
 			recorder := httptest.NewRecorder()
 
 			// Marshal body data to JSON

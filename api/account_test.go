@@ -11,13 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	gomock "go.uber.org/mock/gomock"
-	"github.com/stretchr/testify/require"
 	mockdb "github.com/MohammadZeyaAhmad/bank/db/mock"
 	db "github.com/MohammadZeyaAhmad/bank/db/sqlc"
 	"github.com/MohammadZeyaAhmad/bank/token"
 	"github.com/MohammadZeyaAhmad/bank/util"
+	mockwk "github.com/MohammadZeyaAhmad/bank/worker/mock"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/require"
+	gomock "go.uber.org/mock/gomock"
 )
 
 func TestGetAccountAPI(t *testing.T) {
@@ -138,7 +139,9 @@ func TestGetAccountAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+            taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
+
+			server := newTestServer(t, store, taskDistributor)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/accounts/%d", tc.accountID)
@@ -250,8 +253,9 @@ func TestCreateAccountAPI(t *testing.T) {
 
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
-
-			server := newTestServer(t, store)
+            taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
+			
+			server := newTestServer(t, store, taskDistributor)
 			recorder := httptest.NewRecorder()
 
 			// Marshal body data to JSON
@@ -399,8 +403,9 @@ func TestListAccountsAPI(t *testing.T) {
 
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
-
-			server := newTestServer(t, store)
+            
+			taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
+			server := newTestServer(t, store, taskDistributor)
 			recorder := httptest.NewRecorder()
 
 			url := "/accounts"

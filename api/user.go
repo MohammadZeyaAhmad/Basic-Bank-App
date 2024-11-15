@@ -7,6 +7,7 @@ import (
 
 	db "github.com/MohammadZeyaAhmad/bank/db/sqlc"
 	"github.com/MohammadZeyaAhmad/bank/util"
+	"github.com/MohammadZeyaAhmad/bank/worker"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -62,9 +63,15 @@ func (server *Server) createUser(ctx *gin.Context) {
 			ctx.JSON(http.StatusForbidden, errorResponse(err))
 			return
 		}
+		
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	taskPayload := &worker.PayloadSendVerifyEmail{
+				Username: user.Username,
+			}
+	server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload)
 
 	rsp := newUserResponse(user)
 	ctx.JSON(http.StatusOK, rsp)

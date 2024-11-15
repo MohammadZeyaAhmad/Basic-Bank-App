@@ -35,6 +35,7 @@ sqlc:
 
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/MohammadZeyaAhmad/bank/db/sqlc Store
+	mockgen -package mockwk -destination worker/mock/distributor.go github.com/MohammadZeyaAhmad/bank/worker TaskDistributor
 
 test:
 	go test -v -cover -short ./...
@@ -48,4 +49,7 @@ db_docs:
 db_schema:
 	dbml2sql --postgres -o doc/schema.sql doc/db.dbml
 
-.PHONY: network postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 new_migration  sqlc test server db_docs db_schema
+redis:
+	docker run --name redis -p 6379:6379 -d redis:7-alpine
+
+.PHONY: network postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 new_migration  sqlc test server db_docs db_schema redis
