@@ -10,6 +10,7 @@ import (
 	"github.com/MohammadZeyaAhmad/bank/worker"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/hibiken/asynq"
 )
 
 type createUserRequest struct {
@@ -50,14 +51,28 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.CreateUserParams{
-		Username:       req.Username,
-		HashedPassword: hashedPassword,
-		FullName:       req.FullName,
-		Email:          req.Email,
+	arg := db.CreateUserTxParams{
+		CreateUserParams: db.CreateUserParams{
+			Username:       req.Username,
+			HashedPassword: hashedPassword,
+			FullName:       req.FullName,
+			Email:          req.Email,
+		},
+		AfterCreate: func(user db.User) error {
+			taskPayload := &worker.PayloadSendVerifyEmail{
+				Username: user.Username,
+			}
+			opts := []asynq.Option{
+				asynq.MaxRetry(10),
+				asynq.ProcessIn(10 * time.Second),
+				asynq.Queue(worker.QueueCritical),
+			}
+
+			return server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
+		},
 	}
 
-	user, err := server.store.CreateUser(ctx, arg)
+	txResult, err := server.store.CreateUserTx(ctx, arg)
 	if err != nil {
 		if db.ErrorCode(err) == db.UniqueViolation {
 			ctx.JSON(http.StatusForbidden, errorResponse(err))
@@ -67,13 +82,18 @@ func (server *Server) createUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
+    
 	taskPayload := &worker.PayloadSendVerifyEmail{
-				Username: user.Username,
+				Username: txResult.User.Username,
 			}
-	server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload)
+    opts := []asynq.Option{
+				asynq.MaxRetry(10),
+				asynq.ProcessIn(10 * time.Second),
+				asynq.Queue(worker.QueueCritical),
+			}
+	server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
 
-	rsp := newUserResponse(user)
+	rsp := newUserResponse(txResult.User)
 	ctx.JSON(http.StatusOK, rsp)
 }
 
