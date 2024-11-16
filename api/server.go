@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 
 	db "github.com/MohammadZeyaAhmad/bank/db/sqlc"
 	"github.com/MohammadZeyaAhmad/bank/token"
@@ -19,6 +20,7 @@ type Server struct {
 	tokenMaker token.Maker
 	router     *gin.Engine
 	taskDistributor worker.TaskDistributor
+	httpServer      *http.Server
 }
 
 // NewServer creates a new HTTP server and set up routing.
@@ -40,6 +42,10 @@ func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDi
 	}
 
 	server.setupRouter()
+	
+	server.httpServer = &http.Server{
+		Handler: server.router,
+	}
 	return server, nil
 }
 
@@ -61,6 +67,21 @@ func (server *Server) setupRouter() {
 // Start runs the HTTP server on a specific address.
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)
+}
+
+func (server *Server) Shutdown() error {
+	if server.httpServer == nil {
+		err := fmt.Errorf("server is not initialized")
+		return err
+	}
+
+	fmt.Println("Shutting down the server...")
+	if err := server.httpServer.Close(); err != nil {
+		return err
+	}
+
+	fmt.Println("Server shutdown completed successfully.")
+	return nil
 }
 
 func errorResponse(err error) gin.H {
