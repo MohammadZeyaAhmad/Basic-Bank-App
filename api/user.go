@@ -83,16 +83,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
     
-	taskPayload := &worker.PayloadSendVerifyEmail{
-				Username: txResult.User.Username,
-			}
-    opts := []asynq.Option{
-				asynq.MaxRetry(10),
-				asynq.ProcessIn(10 * time.Second),
-				asynq.Queue(worker.QueueCritical),
-			}
-	server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
-
+	
 	rsp := newUserResponse(txResult.User)
 	ctx.JSON(http.StatusOK, rsp)
 }
