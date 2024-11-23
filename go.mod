@@ -1,6 +1,6 @@
 module github.com/MohammadZeyaAhmad/bank
 
-go 1.22.0
+go 1.22.7
 
 toolchain go1.22.8
 
@@ -12,16 +12,23 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/google/uuid v1.6.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.24.0
 	github.com/hibiken/asynq v0.25.0
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/o1egl/paseto v1.0.0
+	github.com/rakyll/statik v0.1.7
+	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.27.0
 	golang.org/x/sync v0.9.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697
+	google.golang.org/grpc v1.68.0
+	google.golang.org/protobuf v1.35.2
 )
 
 require (
@@ -67,10 +74,10 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
+	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/text v0.20.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
-	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

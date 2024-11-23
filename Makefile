@@ -52,4 +52,14 @@ db_schema:
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine
 
-.PHONY: network postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 new_migration  sqlc test server db_docs db_schema redis
+proto:
+	rm -f pb/*.go
+	rm -f doc/swagger/*.swagger.json
+	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
+	--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+	--grpc-gateway_out=pb --grpc-gateway_opt=paths=source_relative \
+	--openapiv2_out=doc/swagger --openapiv2_opt=allow_merge=true,merge_file_name=simple_bank \
+	proto/*.proto
+	statik -src=./doc/swagger -dest=./doc
+
+.PHONY: network postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 new_migration  sqlc test server db_docs db_schema redis proto
