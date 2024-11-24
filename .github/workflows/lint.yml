@@ -1,4 +1,5 @@
-name: run golangci lint
+name: Run golangci-lint
+
 on:
   push:
     branches:
@@ -8,22 +9,44 @@ on:
 
 permissions:
   contents: read
- 
+
 jobs:
   golangci:
-    name: lint
+    name: Lint
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '^1.21'
-          cache: false
-      - name: Install packages
-        run: go get ./...
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
-        with:
-          version: v1.54
 
-         
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+          cache: 'true'
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-mod-
+                
+      - name: Format
+        run: |
+          if [ -n "$(gofmt -s -l .)" ]; then
+            echo "Code is not formatted properly"
+            exit 1
+          fi
+
+      - name: Go mod tidy
+        run: go mod tidy
+
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54
+
+      - name: Run golangci-lint
+        run: golangci-lint run

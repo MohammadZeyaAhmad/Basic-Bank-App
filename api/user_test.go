@@ -69,9 +69,6 @@ func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 	require.Empty(t, gotUser.HashedPassword)
 }
 
-
-
-
 func TestCreateUserAPI(t *testing.T) {
 	user, password := randomUser(t)
 
@@ -90,7 +87,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":     user.Email,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
-			
+
 				arg := db.CreateUserTxParams{
 					CreateUserParams: db.CreateUserParams{
 						Username: user.Username,
@@ -110,7 +107,7 @@ func TestCreateUserAPI(t *testing.T) {
 					DistributeTaskSendVerifyEmail(gomock.Any(), taskPayload, gomock.Any()).
 					Times(1).
 					Return(nil)
-				
+
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -131,7 +128,7 @@ func TestCreateUserAPI(t *testing.T) {
 					Times(1).
 					Return(db.CreateUserTxResult{}, sql.ErrConnDone)
 
-			    taskDistributor.EXPECT().
+				taskDistributor.EXPECT().
 					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
@@ -152,8 +149,8 @@ func TestCreateUserAPI(t *testing.T) {
 					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(db.CreateUserTxResult{}, db.ErrUniqueViolation)
-				
-                taskDistributor.EXPECT().
+
+				taskDistributor.EXPECT().
 					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
@@ -194,7 +191,7 @@ func TestCreateUserAPI(t *testing.T) {
 				store.EXPECT().
 					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
-				
+
 				taskDistributor.EXPECT().
 					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
@@ -233,14 +230,14 @@ func TestCreateUserAPI(t *testing.T) {
 			storeCtrl := gomock.NewController(t)
 			defer storeCtrl.Finish()
 
-			workerCtrl:=gomock.NewController(t)
-            defer workerCtrl.Finish()
-			
-			store := mockdb.NewMockStore(storeCtrl)
-			
-		    worker:=mockwk.NewMockTaskDistributor(workerCtrl)
+			workerCtrl := gomock.NewController(t)
+			defer workerCtrl.Finish()
 
-			tc.buildStubs(store,worker)
+			store := mockdb.NewMockStore(storeCtrl)
+
+			worker := mockwk.NewMockTaskDistributor(workerCtrl)
+
+			tc.buildStubs(store, worker)
 			server := newTestServer(t, store, worker)
 			recorder := httptest.NewRecorder()
 
@@ -361,8 +358,6 @@ func TestLoginUserAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			
-			
 			taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
 
 			server := newTestServer(t, store, taskDistributor)
@@ -395,4 +390,3 @@ func randomUser(t *testing.T) (user db.User, password string) {
 	}
 	return
 }
-

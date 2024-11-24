@@ -17,7 +17,7 @@ func newTestServer(t *testing.T, store db.Store, taskDistributor worker.TaskDist
 		TokenSymmetricKey:   util.RandomString(32),
 		AccessTokenDuration: time.Minute,
 	}
-    
+
 	server, err := NewServer(config, store, taskDistributor)
 	require.NoError(t, err)
 

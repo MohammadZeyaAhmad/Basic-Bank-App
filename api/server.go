@@ -16,10 +16,10 @@ import (
 
 // Server serves HTTP requests for our banking service.
 type Server struct {
-	config     util.Config
-	store      db.Store
-	tokenMaker token.Maker
-	router     *gin.Engine
+	config          util.Config
+	store           db.Store
+	tokenMaker      token.Maker
+	router          *gin.Engine
 	taskDistributor worker.TaskDistributor
 	httpServer      *http.Server
 }
@@ -32,19 +32,19 @@ func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDi
 	}
 
 	server := &Server{
-		config:     config,
-		store:      store,
-		tokenMaker: tokenMaker,
+		config:          config,
+		store:           store,
+		tokenMaker:      tokenMaker,
 		taskDistributor: taskDistributor,
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-    if err := v.RegisterValidation("currency", validCurrency); err != nil {
-        log.Fatalf("Error registering validation: %v", err)
-    }
-}
+		if err := v.RegisterValidation("currency", validCurrency); err != nil {
+			log.Fatalf("Error registering validation: %v", err)
+		}
+	}
 	server.setupRouter()
-	
+
 	server.httpServer = &http.Server{
 		Handler: server.router,
 	}
@@ -62,7 +62,7 @@ func (server *Server) setupRouter() {
 	authRoutes.POST("/accounts", server.createAccount)
 	authRoutes.GET("/accounts/:id", server.getAccount)
 	authRoutes.GET("/accounts", server.listAccounts)
-    authRoutes.POST("/transfers", server.createTransfer)
+	authRoutes.POST("/transfers", server.createTransfer)
 	server.router = router
 }
 
