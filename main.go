@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/MohammadZeyaAhmad/bank/api"
 	db "github.com/MohammadZeyaAhmad/bank/db/sqlc"
 	_ "github.com/MohammadZeyaAhmad/bank/doc/statik"
 	"github.com/MohammadZeyaAhmad/bank/gapi"
@@ -258,33 +257,33 @@ func runGatewayServer(
 	})
 }
 
-func runGinServer(ctx context.Context, config util.Config, 	waitGroup *errgroup.Group, store db.Store, taskDistributor worker.TaskDistributor) {
-	server, err := api.NewServer(config, store, taskDistributor)
-	if err != nil {
-		log.Fatal().Err(err).Msg("cannot create server")
-	}
+// func runGinServer(ctx context.Context, config util.Config, 	waitGroup *errgroup.Group, store db.Store, taskDistributor worker.TaskDistributor) {
+// 	server, err := api.NewServer(config, store, taskDistributor)
+// 	if err != nil {
+// 		log.Fatal().Err(err).Msg("cannot create server")
+// 	}
 
-  waitGroup.Go(func() error {
-    err = server.Start(config.HTTPServerAddress)
-	if err != nil {
-		log.Fatal().Err(err).Msg("cannot start server")
-		return err
-	}
-	return nil;
-  })
+//   waitGroup.Go(func() error {
+//     err = server.Start(config.HTTPServerAddress)
+// 	if err != nil {
+// 		log.Fatal().Err(err).Msg("cannot start server")
+// 		return err
+// 	}
+// 	return nil;
+//   })
 
-  waitGroup.Go(func() error {
-		<-ctx.Done()
-		log.Info().Msg("graceful shutdown HTTP server")
+//   waitGroup.Go(func() error {
+// 		<-ctx.Done()
+// 		log.Info().Msg("graceful shutdown HTTP server")
 
-		err := server.Shutdown()
-		if err != nil {
-			log.Error().Err(err).Msg("failed to shutdown HTTP server")
-			return err
-		}
+// 		err := server.Shutdown()
+// 		if err != nil {
+// 			log.Error().Err(err).Msg("failed to shutdown HTTP server")
+// 			return err
+// 		}
 
-		log.Info().Msg("HTTP server is stopped")
-		return nil
-	})
+// 		log.Info().Msg("HTTP server is stopped")
+// 		return nil
+// 	})
 	
-}
+// }

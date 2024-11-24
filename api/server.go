@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	db "github.com/MohammadZeyaAhmad/bank/db/sqlc"
@@ -38,9 +39,10 @@ func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDi
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("currency", validCurrency)
-	}
-
+    if err := v.RegisterValidation("currency", validCurrency); err != nil {
+        log.Fatalf("Error registering validation: %v", err)
+    }
+}
 	server.setupRouter()
 	
 	server.httpServer = &http.Server{
