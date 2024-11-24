@@ -273,8 +273,8 @@ func TestTransferAPI(t *testing.T) {
 
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
-            
-			worker:=mockwk.NewMockTaskDistributor(ctrl)
+
+			worker := mockwk.NewMockTaskDistributor(ctrl)
 			server := newTestServer(t, store, worker)
 			recorder := httptest.NewRecorder()
 

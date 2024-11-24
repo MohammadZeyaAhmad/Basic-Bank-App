@@ -139,7 +139,7 @@ func TestGetAccountAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-            taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
+			taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
 
 			server := newTestServer(t, store, taskDistributor)
 			recorder := httptest.NewRecorder()
@@ -253,8 +253,8 @@ func TestCreateAccountAPI(t *testing.T) {
 
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
-            taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
-			
+			taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
+
 			server := newTestServer(t, store, taskDistributor)
 			recorder := httptest.NewRecorder()
 
@@ -403,7 +403,7 @@ func TestListAccountsAPI(t *testing.T) {
 
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
-            
+
 			taskDistributor := mockwk.NewMockTaskDistributor(ctrl)
 			server := newTestServer(t, store, taskDistributor)
 			recorder := httptest.NewRecorder()
